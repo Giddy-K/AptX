@@ -1,0 +1,127 @@
+# Node.js Backend — Style & Architecture Rules
+
+You are an expert in Node.js, Express.js, MongoDB, and cloud-native backend patterns.
+
+## Code Style & Structure
+- Write clean, idiomatic JavaScript or TypeScript, favoring simplicity and readability.
+- Keep functions and controllers small; apply single responsibility principle.
+- Use **async/await** for asynchronous code to ensure readability and avoid callback hell.
+- Modularize code: separate routes, middleware, controllers, services, and models.
+- Organize code based on functionality (e.g., routes, services, controllers, models).
+- Prefer **ES6+** features such as destructuring, template literals, and async/await.
+- Use **JSDoc** or **TypeScript** to ensure well-documented APIs and types.
+- Use **const** and **let** for variable declarations. Avoid **var**.
+
+## Naming Conventions
+- **Files/Folders**: use kebab-case (e.g., `user-service`, `auth-controller`).
+- **Controller Names**: `UserController`, `AuthController`.
+- **Model Names**: Use singular (e.g., `User`, `Order`).
+- **Route/Method Names**: Keep route names plural and RESTful (e.g., `/users`, `/orders`).
+- **Private Variables**: use camelCase (e.g., `const userData`).
+- **Middleware/Services**: Use meaningful names like `authMiddleware`, `validateUser`.
+
+## Project Structure
+src/
+  ├── api/
+  │   ├── controllers/
+  │   ├── routes/
+  │   └── services/
+  ├── config/              # Environment variables, config files
+  ├── models/              # Mongoose models (or any ORM models)
+  ├── middleware/          # Middleware like auth, validation
+  ├── utils/               # Helper functions
+  └── index.js             # Main entry point
+tests/
+  ├── api/
+  │   └── user.test.js     # Unit tests for API endpoints
+  └── utils/
+      └── helper.test.js   # Unit tests for helpers
+
+## Type usage & design
+- Use **classes** for controllers and services that have methods for business logic.
+- Use **const** for functions that do not change.
+- Use **Arrow functions** for inline, short functions.
+- Prefer **pure functions** for business logic.
+
+## Dependency Injection
+- Use **middleware** for pre/post-processing tasks.
+- Use **express.Router** to handle routing and keep controllers clean.
+- Avoid direct dependency injection in controllers; prefer service layers.
+
+## Async & Concurrency
+- Use async/await for handling asynchronous tasks like database calls or third-party API requests.
+- Handle errors gracefully using `try/catch` blocks.
+- Use **Promise.all** for concurrent tasks (e.g., in batch processes).
+- Avoid blocking I/O calls; never use `.then()` or `.catch()` if `async/await` can handle it.
+
+## Error Handling & Logging
+- Use **try/catch** for error handling, throw meaningful errors in services.
+- Centralize error handling in an **error-handling middleware** (e.g., `errorMiddleware`).
+- Always return a **consistent error format** (status code, error message).
+- Use **Winston** or **Morgan** for logging HTTP requests and system logs.
+
+## APIs
+- RESTful, follow standard HTTP methods: `GET`, `POST`, `PUT`, `DELETE`.
+- Use **express.Router** for routing and controllers.
+- Ensure **API versioning** (e.g., `/v1/users`, `/v2/users`).
+- Validate requests with **Joi** or **express-validator** for body, query, or header parameters.
+- Document API endpoints using **Swagger** or **JSDoc**.
+
+## Database Design (Firebase/Firestore)
+- Prefer **Firestore** collections and documents to model your data.
+- Use **Firestore queries** to filter and sort data; avoid raw Firebase queries when possible.
+- Use **subcollections** for related data to maintain a clean, hierarchical structure.
+- Use **Firestore security rules** to enforce validation and data integrity.
+- Apply **indexes** to optimize frequent queries, especially on fields frequently used for filtering and ordering.
+- Use **pagination** with `startAt()`, `startAfter()`, `limit()` for large collections in API responses.
+- Use **Firestore transactions** to ensure atomicity when performing multiple operations (e.g., reading and writing in a single transaction).
+- For complex queries, consider using **Cloud Functions** to trigger aggregations or advanced data processing when needed (e.g., counts, sums).
+- Use **Firestore references** to establish relationships between collections and documents instead of embedding large objects.
+- Leverage **batch writes** for multiple document updates to ensure efficient, atomic updates.
+
+## Caching & Performance
+- Use **Redis** for caching frequently queried data.
+- Ensure API endpoints that fetch large datasets are **paginated**.
+- Use **compression** middleware (e.g., `compression` package) to reduce response sizes.
+- Always measure performance and identify bottlenecks with **profiling tools** (e.g., `clinic.js`).
+
+## Security
+- Sanitize user input to avoid **XSS** and **SQL Injection** attacks.
+- Use **Helmet.js** for setting various HTTP headers to improve security.
+- Always hash sensitive data (e.g., passwords) using **bcrypt**.
+- Enable **rate-limiting** and **CORS** for API access control.
+- Ensure HTTPS is enforced on production deployments.
+- Use **JWT** or **OAuth2** for authentication and authorization.
+- Implement **role-based access control** (RBAC) in routes.
+
+## Observability
+- Use **OpenTelemetry** or **Datadog** for distributed tracing.
+- Log errors with **Winston**, and output **structured logs** with correlation IDs for tracking.
+- Use **Prometheus** or **Grafana** for monitoring system metrics and alerting.
+- Collect **API usage data** and implement **rate-limiting**.
+
+## Testing
+- Use **Mocha** or **Jest** for unit testing.
+- Mock external dependencies with **Sinon** or **Jest mock** functions.
+- Write integration tests to test the entire flow (API -> database).
+- Maintain **coverage reports** and ensure tests are ran on every commit.
+
+## CI/CD
+- Use **GitHub Actions** or **CircleCI** to automate testing and deployment.
+- Create a **multi-stage Docker build** to containerize the application.
+- Use **Kubernetes** for orchestrating containers if scaling is needed.
+- Automate database migrations in deployment scripts to avoid manual intervention.
+
+## Documentation & Conventions
+- Use **JSDoc** for function documentation, especially public-facing methods.
+- Maintain a **README.md** with setup, local environment variables, and deployment instructions.
+- Use **ADRs** (Architecture Decision Records) to document major design decisions.
+- Keep a **CHANGELOG.md** to document all API changes and version updates.
+
+## Anti-patterns to Avoid
+- Hardcoding configuration (use environment variables or config files).
+- Business logic in routes/controllers; move logic to services.
+- Direct manipulation of data in controllers; use models and services.
+- Failing to use async/await, instead relying on callbacks or blocking code.
+- Exposing unnecessary data (e.g., full database models) through APIs.
+- Writing large, monolithic files for controllers or services; aim for modularity.
