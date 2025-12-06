@@ -65,3 +65,4 @@ CLAUDE.md
 /backend/service-account-key.json
 /backend/firebase-admin-key.json
 /backend/*.json
+/backend/package-lock.json
