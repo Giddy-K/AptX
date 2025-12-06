@@ -60,9 +60,20 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // Firebase auth errors
-  if (err.code && err.code.startsWith('auth/')) {
+  if (err.code && typeof err.code === 'string' && err.code.startsWith('auth/')) {
     const message = getFirebaseAuthErrorMessage(err.code);
     error = new AppError(message, 401);
+  }
+
+  // Firestore gRPC errors
+  if (err.code && typeof err.code === 'number') {
+    const grpcMessages = {
+      5: 'Database not found or not configured properly',
+      7: 'Permission denied',
+      16: 'Unauthenticated request',
+    };
+    const message = grpcMessages[err.code] || err.message || 'Database error';
+    error = new AppError(message, err.code === 16 ? 401 : 500);
   }
 
   // JWT errors
@@ -80,12 +91,6 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'MulterError') {
     const message = getMulterErrorMessage(err.code);
     error = new AppError(message, 400);
-  }
-
-  // Google Cloud errors
-  if (err.code && typeof err.code === 'number' && err.code >= 400) {
-    const message = err.message || 'Google Cloud service error';
-    error = new AppError(message, err.code);
   }
 
   const statusCode = error.statusCode || 500;
