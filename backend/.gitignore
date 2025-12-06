@@ -7,13 +7,21 @@ yarn.lock
 .env
 .env.local
 .env.development
+.env.development.local
+.env.uat
+.env.uat.local
 .env.production
+.env.production.local
 
 # Google Cloud credentials
 config/service-account-key.json
+service-account-key.json
+firebase-admin-key.json
+*-key.json
 *.json
 !package.json
 !tsconfig.json
+!package-lock.json
 
 # Logs
 logs/
@@ -53,3 +61,4 @@ uploads/
 Thumbs.db
 CLAUDE.md
 .cursorrules
+/backend/service-account-key.json
