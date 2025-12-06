@@ -6,6 +6,7 @@ import Button from '../../components/common/Button';
 import { LogOut, Volume2, Home } from 'lucide-react';
 import LessonList from '../../components/student/LessonList';
 import LessonViewer from '../../components/student/LessonViewer';
+import logo from '../../assets/APTX_logo.png';
 
 function StudentDashboard() {
   const { user, logout } = useAuth();
@@ -29,9 +30,9 @@ function StudentDashboard() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <span className="text-4xl">📚</span>
+              <img src={logo} alt="AptX Logo" className="h-12 w-auto" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Hello, {user?.name}!</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Hello, {user?.firstName || user?.email?.split('@')[0]}!</h1>
                 <p className="text-sm text-gray-600">Ready to learn?</p>
               </div>
             </div>
