@@ -13,13 +13,30 @@ const initializeFirebase = () => {
       return firebaseApp;
     }
 
-    const serviceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS
-      ? require(process.env.GOOGLE_APPLICATION_CREDENTIALS)
-      : {
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        };
+    let serviceAccount;
+
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      logger.info('Loading Firebase credentials from service account file');
+      serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    } else {
+      logger.info('Loading Firebase credentials from environment variables');
+      serviceAccount = {
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      };
+
+      // Debug: Log if credentials are missing
+      if (!serviceAccount.projectId) {
+        logger.error('FIREBASE_PROJECT_ID is not set');
+      }
+      if (!serviceAccount.clientEmail) {
+        logger.error('FIREBASE_CLIENT_EMAIL is not set');
+      }
+      if (!serviceAccount.privateKey) {
+        logger.error('FIREBASE_PRIVATE_KEY is not set');
+      }
+    }
 
     firebaseApp = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
@@ -27,7 +44,23 @@ const initializeFirebase = () => {
       storageBucket: process.env.GCS_BUCKET_NAME,
     });
 
-    firestore = admin.firestore();
+    // Use the named database "aptx" or default database
+    const databaseId = process.env.FIRESTORE_DATABASE_ID;
+
+    if (databaseId && databaseId !== '(default)') {
+      // Use named database
+      logger.info(`Using Firestore database: ${databaseId}`);
+      const { Firestore } = require('@google-cloud/firestore');
+      firestore = new Firestore({
+        projectId: serviceAccount.projectId,
+        credentials: serviceAccount,
+        databaseId: databaseId,
+      });
+    } else {
+      // Use default database
+      logger.info('Using Firestore default database');
+      firestore = admin.firestore();
+    }
 
     // Configure Firestore settings
     firestore.settings({
