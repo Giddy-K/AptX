@@ -53,13 +53,13 @@ export const AuthProvider = ({ children }) => {
       const response = await authApi.login(credentials);
 
       if (response.success) {
-        const { token, user } = response.data;
+        const { accessToken, user } = response.data;
 
         // Store token and user
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', accessToken);
         localStorage.setItem('user', JSON.stringify(user));
 
-        setToken(token);
+        setToken(accessToken);
         setUser(user);
 
         toast.success('Welcome back!');
@@ -79,13 +79,13 @@ export const AuthProvider = ({ children }) => {
       const response = await authApi.register(userData);
 
       if (response.success) {
-        const { token, user } = response.data;
+        const { accessToken, user } = response.data;
 
         // Store token and user
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', accessToken);
         localStorage.setItem('user', JSON.stringify(user));
 
-        setToken(token);
+        setToken(accessToken);
         setUser(user);
 
         toast.success('Registration successful!');
@@ -148,6 +148,58 @@ export const AuthProvider = ({ children }) => {
     return !!token && !!user;
   };
 
+  /**
+   * Google Sign-In
+   */
+  const googleSignIn = async (idToken, role) => {
+    try {
+      const response = await authApi.googleSignIn(idToken, role);
+
+      if (response.success) {
+        const { accessToken, user } = response.data;
+
+        // Store token and user
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        setToken(accessToken);
+        setUser(user);
+
+        toast.success('Welcome!');
+        return { success: true, user };
+      }
+    } catch (error) {
+      toast.error(error.message || 'Google sign-in failed');
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Anonymous Sign-In
+   */
+  const anonymousSignIn = async () => {
+    try {
+      const response = await authApi.anonymousSignIn();
+
+      if (response.success) {
+        const { accessToken, user } = response.data;
+
+        // Store token and user
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        setToken(accessToken);
+        setUser(user);
+
+        toast.success('Exploring as guest!');
+        return { success: true, user };
+      }
+    } catch (error) {
+      toast.error(error.message || 'Anonymous sign-in failed');
+      return { success: false, error: error.message };
+    }
+  };
+
   const value = {
     user,
     token,
@@ -158,6 +210,8 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
     hasRole,
     isAuthenticated,
+    googleSignIn,
+    anonymousSignIn,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
