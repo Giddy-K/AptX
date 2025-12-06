@@ -59,6 +59,27 @@ export const authApi = {
   resetPassword: async (token, newPassword) => {
     return await api.post('/auth/reset-password', { token, newPassword });
   },
+
+  /**
+   * Google Sign-In
+   */
+  googleSignIn: async (idToken, role) => {
+    return await api.post('/auth/google', { idToken, role });
+  },
+
+  /**
+   * Anonymous Sign-In
+   */
+  anonymousSignIn: async () => {
+    return await api.post('/auth/anonymous');
+  },
+
+  /**
+   * Link anonymous account to email/password
+   */
+  linkAccount: async (email, password) => {
+    return await api.post('/auth/link-account', { email, password });
+  },
 };
 
 export default authApi;
