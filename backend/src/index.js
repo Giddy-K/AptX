@@ -1,4 +1,5 @@
-require('dotenv').config();
+// Load configuration first (this will load the correct .env file)
+const config = require('./config');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -69,13 +70,13 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
-// TODO: Import and use routes here
-// const authRoutes = require('./api/routes/auth-routes');
+const authRoutes = require('./api/routes/auth-routes');
+// TODO: Import and use other routes here
 // const teacherRoutes = require('./api/routes/teacher-routes');
 // const guardianRoutes = require('./api/routes/guardian-routes');
 // const studentRoutes = require('./api/routes/student-routes');
 
-// app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
 // app.use('/api/v1/teacher', teacherRoutes);
 // app.use('/api/v1/guardian', guardianRoutes);
 // app.use('/api/v1/student', studentRoutes);
