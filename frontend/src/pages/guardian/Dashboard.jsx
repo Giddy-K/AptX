@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState } from "react";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   LayoutDashboard,
   Users,
@@ -8,11 +8,12 @@ import {
   Bell,
   LogOut,
   Menu,
-  X
-} from 'lucide-react';
-import Button from '../../components/common/Button';
-import GuardianOverview from '../../components/guardian/GuardianOverview';
-import StudentProgress from '../../components/guardian/StudentProgress';
+  X,
+} from "lucide-react";
+import Button from "../../components/common/Button";
+import GuardianOverview from "../../components/guardian/GuardianOverview";
+import StudentProgress from "../../components/guardian/StudentProgress";
+import logo from "../../assets/APTX_logo.png";
 
 function GuardianDashboard() {
   const { user, logout } = useAuth();
@@ -20,10 +21,10 @@ function GuardianDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/guardian/dashboard', icon: LayoutDashboard },
-    { name: 'My Students', href: '/guardian/students', icon: Users },
-    { name: 'Progress', href: '/guardian/progress', icon: TrendingUp },
-    { name: 'Notifications', href: '/guardian/notifications', icon: Bell },
+    { name: "Dashboard", href: "/guardian/dashboard", icon: LayoutDashboard },
+    { name: "My Students", href: "/guardian/students", icon: Users },
+    { name: "Progress", href: "/guardian/progress", icon: TrendingUp },
+    { name: "Notifications", href: "/guardian/notifications", icon: Bell },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -39,14 +40,13 @@ function GuardianDashboard() {
 
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
             <div className="flex items-center">
-              <span className="text-2xl mr-2">👨‍👩‍👧</span>
-              <span className="text-xl font-bold text-gray-900">AptX</span>
+              <img src={logo} alt="AptX Logo" className="h-10 w-auto mr-2" />
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -60,11 +60,16 @@ function GuardianDashboard() {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-success-600 rounded-full flex items-center justify-center">
                 <span className="text-white font-semibold text-lg">
-                  {user?.name?.charAt(0).toUpperCase()}
+                  {user?.firstName?.charAt(0).toUpperCase() ||
+                    user?.email?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.firstName && user?.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : user?.email}
+                </p>
                 <p className="text-xs text-gray-500 capitalize">Guardian</p>
               </div>
             </div>
@@ -79,8 +84,8 @@ function GuardianDashboard() {
                   to={item.href}
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition ${
                     isActive(item.href)
-                      ? 'bg-success-50 text-success-700'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? "bg-success-50 text-success-700"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
@@ -113,7 +118,7 @@ function GuardianDashboard() {
             </h1>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600 hidden sm:block">
-                {user?.name}
+                {user?.firstName || user?.email?.split("@")[0]}
               </span>
             </div>
           </div>
