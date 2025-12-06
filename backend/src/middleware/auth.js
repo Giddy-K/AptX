@@ -1,10 +1,52 @@
+const jwt = require('jsonwebtoken');
 const { getAuth } = require('../config/firebase');
 const { AppError, asyncHandler } = require('./error-handler');
 const { unauthorizedResponse, forbiddenResponse } = require('../utils/response');
 const logger = require('../utils/logger');
 
 /**
- * Verify Firebase ID token
+ * JWT-based authentication middleware
+ */
+const authMiddleware = asyncHandler(async (req, res, next) => {
+  let token;
+
+  // Get token from header
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  // Check if token exists
+  if (!token) {
+    return unauthorizedResponse(res, 'No authentication token provided');
+  }
+
+  try {
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach user to request
+    req.user = {
+      id: decoded.id,
+      uid: decoded.id, // For compatibility with existing code
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    next();
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError') {
+      return unauthorizedResponse(res, 'Invalid token');
+    }
+    if (error.name === 'TokenExpiredError') {
+      return unauthorizedResponse(res, 'Token expired');
+    }
+    logger.error('Token verification failed', { error: error.message });
+    return unauthorizedResponse(res, 'Authentication failed');
+  }
+});
+
+/**
+ * Verify Firebase ID token (for client-side Firebase auth)
  */
 const verifyToken = asyncHandler(async (req, res, next) => {
   let token;
@@ -27,6 +69,7 @@ const verifyToken = asyncHandler(async (req, res, next) => {
     // Attach user to request
     req.user = {
       uid: decodedToken.uid,
+      id: decodedToken.uid, // For compatibility
       email: decodedToken.email,
       role: decodedToken.role || 'student',
     };
@@ -176,6 +219,7 @@ const authorizeTeacherCurriculum = asyncHandler(async (req, res, next) => {
 });
 
 module.exports = {
+  authMiddleware,
   verifyToken,
   authorize,
   authorizeOwnerOrAdmin,
