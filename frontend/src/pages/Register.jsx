@@ -1,35 +1,37 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import Button from '../components/common/Button';
-import { UserPlus, Mail, Lock, User, Users } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import Button from "../components/common/Button";
+import { UserPlus, Mail, Lock, User, Users } from "lucide-react";
+import logo from "../assets/APTX_logo.png";
 
 function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'teacher'
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "teacher",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     // Validate password length
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -41,20 +43,35 @@ function Register() {
     if (result.success) {
       const { role } = result.user;
       // Navigate based on user role
-      if (role === 'teacher') navigate('/teacher/dashboard');
-      else if (role === 'guardian') navigate('/guardian/dashboard');
-      else if (role === 'student') navigate('/student/dashboard');
+      if (role === "teacher") navigate("/teacher/dashboard");
+      else if (role === "guardian") navigate("/guardian/dashboard");
+      else navigate("/student/dashboard");
     } else {
-      setError(result.error || 'Registration failed');
+      setError(result.error || "Registration failed");
     }
 
     setLoading(false);
   };
 
   const roles = [
-    { value: 'teacher', label: 'Teacher', icon: '👩‍🏫', description: 'Upload and manage curriculum' },
-    { value: 'guardian', label: 'Guardian', icon: '👨‍👩‍👧', description: 'Monitor student progress' },
-    { value: 'student', label: 'Student', icon: '🧒', description: 'Learn with accessible content' },
+    {
+      value: "teacher",
+      label: "Teacher",
+      icon: "👩‍🏫",
+      description: "Upload and manage curriculum",
+    },
+    {
+      value: "guardian",
+      label: "Guardian",
+      icon: "👨‍👩‍👧",
+      description: "Monitor student progress",
+    },
+    {
+      value: "student",
+      label: "Student",
+      icon: "🧒",
+      description: "Learn with accessible content",
+    },
   ];
 
   return (
@@ -62,10 +79,9 @@ function Register() {
       <div className="max-w-2xl w-full space-y-8">
         {/* Logo/Brand */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full mb-4">
-            <span className="text-3xl">📚</span>
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src={logo} alt="AptX Logo" className="h-20 w-auto" />
           </div>
-          <h2 className="text-4xl font-bold text-gray-900">Join AptX</h2>
           <p className="mt-2 text-sm text-gray-600">
             Create your account and start learning
           </p>
@@ -89,31 +105,66 @@ function Register() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name Input */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+            {/* Name Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  First Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="firstName"
+                    type="text"
+                    placeholder="John"
+                    className="input pl-10"
+                    value={formData.firstName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
+                    required
+                    autoComplete="given-name"
+                  />
                 </div>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  className="input pl-10"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                  autoComplete="name"
-                />
+              </div>
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Last Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    className="input pl-10"
+                    value={formData.lastName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
+                    required
+                    autoComplete="family-name"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -126,7 +177,9 @@ function Register() {
                   placeholder="you@example.com"
                   className="input pl-10"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                   autoComplete="email"
                 />
@@ -136,7 +189,10 @@ function Register() {
             {/* Password Input */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Password
                 </label>
                 <div className="relative">
@@ -149,7 +205,9 @@ function Register() {
                     placeholder="••••••••"
                     className="input pl-10"
                     value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     required
                     minLength={6}
                   />
@@ -157,7 +215,10 @@ function Register() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -170,7 +231,12 @@ function Register() {
                     placeholder="••••••••"
                     className="input pl-10"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     required
                     minLength={6}
                   />
@@ -188,16 +254,22 @@ function Register() {
                   <button
                     key={role.value}
                     type="button"
-                    onClick={() => setFormData({...formData, role: role.value})}
+                    onClick={() =>
+                      setFormData({ ...formData, role: role.value })
+                    }
                     className={`p-4 border-2 rounded-lg text-center transition ${
                       formData.role === role.value
-                        ? 'border-primary-600 bg-primary-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? "border-primary-600 bg-primary-50"
+                        : "border-gray-300 hover:border-gray-400"
                     }`}
                   >
                     <div className="text-3xl mb-2">{role.icon}</div>
-                    <div className="font-semibold text-gray-900">{role.label}</div>
-                    <div className="text-xs text-gray-600 mt-1">{role.description}</div>
+                    <div className="font-semibold text-gray-900">
+                      {role.label}
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {role.description}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -211,13 +283,22 @@ function Register() {
                 className="h-4 w-4 mt-1 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 required
               />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                I agree to the{' '}
-                <Link to="/terms" className="text-primary-600 hover:text-primary-500">
+              <label
+                htmlFor="terms"
+                className="ml-2 block text-sm text-gray-700"
+              >
+                I agree to the{" "}
+                <Link
+                  to="/terms"
+                  className="text-primary-600 hover:text-primary-500"
+                >
                   Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-primary-600 hover:text-primary-500">
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to="/privacy"
+                  className="text-primary-600 hover:text-primary-500"
+                >
                   Privacy Policy
                 </Link>
               </label>
